@@ -2,20 +2,22 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { request } from "../../utils/axios-utils";
+import headers from "../../utils/axios-utils";
 
 async function getStandings() {
   const response = await axios.get(
     "https://sports-information.p.rapidapi.com/nba/standings",
     {
       params: { year: "2024", group: "league" },
-      headers: {
-        "x-rapidapi-key": "2ca63158damsh7d1d8b2476028f6p18ebc1jsnc3f7cbc89314",
-        "x-rapidapi-host": "sports-information.p.rapidapi.com",
-      },
+      headers: headers,
     }
   );
   return await response.data;
 }
+
+const fetchStandings = () => {
+  return request({ url: "/standings" });
+};
 
 export default function Standings() {
   const { data, isFetching, isPending } = useQuery({
@@ -27,7 +29,6 @@ export default function Standings() {
   if (isPending) return "Loading...";
   if (isFetching) return "Fetching...";
 
-  console.log(data.standings.entries);
   // console.log(data.standings.entries);
   // console.log(data.standings.entries);
   const td1 = data.standings.entries;
@@ -41,7 +42,7 @@ export default function Standings() {
     <div className="flex w-full flex-wrap bg-blue-500">
       {sortedStandings.map((td) => {
         return (
-          <div className="flex flex-col border ">
+          <div key={td.team.id} className="flex flex-col border">
             <p>{" " + td.team.displayName}</p>
             <p>{(td.stats[14].value * 100).toFixed(2) + "%"}</p>
             <p>{" " + td.stats[16].displayValue}</p>
