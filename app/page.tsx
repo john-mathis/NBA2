@@ -1,14 +1,16 @@
-"use client";
-import dynamic from "next/dynamic";
-
-// import Standings from "./components/Standings/Standings";
-const LazyStandings = dynamic(() => import("./components/Standings/Standings"));
+import Hero from "./(frontend)/components/HeroSection/HeroSection";
+import StatBar from "./(frontend)/components/StatBar/StatBar";
+import { GamesToday } from "./(frontend)/components/GamesToday/GamesToday";
 
 export default function Home() {
   return (
-    <div>
-      {/* <Standings /> */}
-      <LazyStandings />
-    </div>
+    <main
+      className="min-h-screen bg-black text-white flex flex-col items-center 
+    bg-[url(../public/background.png)] bg-no-repeat bg-cover bg-center"
+    >
+      <GamesToday />
+      <Hero />
+      <StatBar />
+    </main>
   );
 }
