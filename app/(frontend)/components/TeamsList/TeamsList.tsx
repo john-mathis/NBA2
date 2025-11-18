@@ -9,7 +9,15 @@ import { useState } from "react";
 
 export default function TeamsList() {
   const isAuthenticated = useAppSelector((s) => s.authUser.isAuthenticated);
-  const [teamSelected, setTeamSelected] = useState(false);
+  const [favorites, setFavorites] = useState<Array<number>>([]);
+
+  console.log(favorites);
+
+  function addToFavorites(team: any) {
+    setFavorites((prev) =>
+      prev.includes(team) ? prev.filter((t) => t !== team) : [...prev, team]
+    );
+  }
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["teams"],
     queryFn: async () => {
@@ -21,7 +29,6 @@ export default function TeamsList() {
   });
 
   const teams = data?.sports?.[0]?.leagues?.[0]?.teams;
-  console.log(data);
 
   if (isLoading)
     return (
@@ -47,10 +54,10 @@ export default function TeamsList() {
           <div key={td.team.id} className="relative">
             {isAuthenticated ? (
               <Star
-                fill={`${teamSelected ? "yellow" : ""}`}
+                fill={`${favorites.includes(td.team.id) ? "yellow" : ""}`}
                 className={`absolute z-20 right-2 top-2 h-5 hover:text-yellow-500 cursor-pointer`}
                 onClick={() => {
-                  setTeamSelected(!teamSelected);
+                  addToFavorites(td.team.id);
                 }}
               />
             ) : null}
