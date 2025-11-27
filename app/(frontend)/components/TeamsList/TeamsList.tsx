@@ -11,12 +11,25 @@ export default function TeamsList() {
   const isAuthenticated = useAppSelector((s) => s.authUser.isAuthenticated);
   const [favorites, setFavorites] = useState<Array<number>>([]);
 
-  console.log(favorites);
+  const { data: userFavorites } = useQuery({
+    queryKey: ["userFavorites"],
+    queryFn: async () => {
+      const res = await internalAPI.get("/api/userTeamFavorites");
+      return res.data;
+    },
+    enabled: isAuthenticated,
+  });
 
-  function addToFavorites(team: any) {
-    setFavorites((prev) =>
-      prev.includes(team) ? prev.filter((t) => t !== team) : [...prev, team]
-    );
+  async function addToFavorites(teamId: number) {
+    const response = await internalAPI.post("/api/userTeamFavoritesToggle", {
+      teamId,
+    });
+
+    // const response = await internalAPI.post(
+    //   "/api/userTeamFavorites/toggle",
+    //   team
+    // );
+    console.log(response);
   }
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["teams"],
