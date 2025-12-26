@@ -9,7 +9,28 @@ import { useState } from "react";
 
 export default function TeamsList() {
   const isAuthenticated = useAppSelector((s) => s.authUser.isAuthenticated);
-  const [teamSelected, setTeamSelected] = useState(false);
+  const [favorites, setFavorites] = useState<Array<number>>([]);
+
+  const { data: userFavorites } = useQuery({
+    queryKey: ["userFavorites"],
+    queryFn: async () => {
+      const res = await internalAPI.get("/api/userTeamFavorites");
+      return res.data;
+    },
+    enabled: isAuthenticated,
+  });
+
+  async function addToFavorites(teamId: number) {
+    const response = await internalAPI.post("/api/userTeamFavoritesToggle", {
+      teamId,
+    });
+
+    // const response = await internalAPI.post(
+    //   "/api/userTeamFavorites/toggle",
+    //   team
+    // );
+    console.log(response);
+  }
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["teams"],
     queryFn: async () => {
@@ -21,7 +42,6 @@ export default function TeamsList() {
   });
 
   const teams = data?.sports?.[0]?.leagues?.[0]?.teams;
-  console.log(data);
 
   if (isLoading)
     return (
@@ -47,10 +67,10 @@ export default function TeamsList() {
           <div key={td.team.id} className="relative">
             {isAuthenticated ? (
               <Star
-                fill={`${teamSelected ? "yellow" : ""}`}
+                fill={`${favorites.includes(td.team.id) ? "yellow" : ""}`}
                 className={`absolute z-20 right-2 top-2 h-5 hover:text-yellow-500 cursor-pointer`}
                 onClick={() => {
-                  setTeamSelected(!teamSelected);
+                  addToFavorites(td.team.id);
                 }}
               />
             ) : null}
