@@ -50,7 +50,7 @@ const Navbar = () => {
         backdropFilter: scrolled ? "blur(16px)" : "none",
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex items-center justify-between text-white border-b border-white/5"
+      className="sticky top-0 left-0 w-full z-50 px-6 py-4 flex items-center justify-between text-white border-b border-white/25"
     >
       {/* Logo */}
       <Link href="/" className="text-xl font-bold tracking-tight select-none">
