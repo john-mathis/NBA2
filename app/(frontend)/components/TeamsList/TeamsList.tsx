@@ -8,28 +8,42 @@ import { useAppSelector } from "@/app/redux/hooks";
 
 export default function TeamsList() {
   const isAuthenticated = useAppSelector((s) => s.authUser.isAuthenticated);
-  const [favorites, setFavorites] = useState<Array<number>>([]);
+  const queryClient = useQueryClient();
 
+  // 1) Load favorites from server
   const { data: userFavorites } = useQuery({
     queryKey: ["userFavorites"],
     queryFn: async () => {
       const res = await internalAPI.get("/api/userTeamFavorites");
-      return res.data;
+      return res.data; // { teams: number[] }
     },
     enabled: isAuthenticated,
   });
 
-  async function addToFavorites(teamId: number) {
-    const response = await internalAPI.post("/api/userTeamFavoritesToggle", {
-      teamId,
-    });
+  const favorites: number[] = userFavorites?.teams?.map(Number) ?? [];
 
-    // const response = await internalAPI.post(
-    //   "/api/userTeamFavorites/toggle",
-    //   team
-    // );
-    console.log(response);
+  // 2) Toggle mutation
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async (teamId: number) => {
+      const res = await internalAPI.post("/api/userTeamFavoritesToggle", {
+        teamId,
+      });
+
+      return res.data; // { updatedTeams: number[] }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["userFavorites"], (old: any) => ({
+        ...(old ?? {}),
+        teams: data.updatedTeams.map(Number),
+      }));
+    },
+  });
+
+  function addToFavorites(teamId: number) {
+    toggleFavoriteMutation.mutate(teamId);
   }
+
+  // 3) Load teams
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["teams"],
     queryFn: async () => {
@@ -66,11 +80,11 @@ export default function TeamsList() {
           <div key={td.team.id} className="relative">
             {isAuthenticated && (
               <Star
-                fill={`${teamSelected ? "yellow" : ""}`}
-                className={`absolute z-20 right-2 top-2 h-5 hover:text-yellow-500 cursor-pointer`}
-                onClick={() => {
-                  setTeamSelected(!teamSelected);
-                }}
+                fill={
+                  favorites.includes(Number(td.team.id)) ? "yellow" : "none"
+                }
+                className="absolute z-20 right-2 top-2 h-5 hover:text-yellow-500 cursor-pointer"
+                onClick={() => addToFavorites(Number(td.team.id))}
               />
             )}
 
