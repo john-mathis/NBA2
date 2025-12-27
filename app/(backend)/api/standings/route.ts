@@ -1,7 +1,6 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
 import { externalAPI } from "../utils/axios-external";
-import { requireAuth } from "../helper/requireAuth";
 
 export async function GET(): Promise<undefined | NextResponse> {
   try {

@@ -1,14 +1,16 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import internalAPI from "@/app/(backend)/api/utils/axios.internal";
 import { useParams } from "next/navigation";
+import { Star } from "lucide-react";
+import Loading from "../Loading/Loading";
 
 async function getTeams(id: string) {
-  const res = await axios.get(`/api/teams/${id}`);
+  const res = await internalAPI.get(`/api/roster/${id}`);
   return res.data;
 }
 
-export default function TeamPage() {
+export default function TeamRoster() {
   const { id } = useParams<{ id: string }>();
 
   const { data, isFetching, error } = useQuery({
@@ -19,16 +21,15 @@ export default function TeamPage() {
   });
 
   if (error) return <p className="text-red-500">Error loading team</p>;
-  if (!data) return <p className="text-neutral-400">Loading...</p>;
+  if (!data) return <Loading />;
 
   const players = data?.team?.athletes ?? [];
   console.log(players);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white px-6 py-8">
-      <div className="border-b border-neutral-800 pb-3 mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{data.team.displayName}</h1>
-        <span className="text-red-500 text-sm">NBA</span>
+      <div className=" pb-3 mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold">{data.team.displayName}</h2>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -42,8 +43,9 @@ export default function TeamPage() {
           .map((p: any) => (
             <div
               key={p.id}
-              className="bg-white text-black rounded-xl shadow-md overflow-hidden hover:scale-[1.02] transition-transform"
+              className="relative bg-white text-black rounded-xl shadow-md overflow-hidden hover:scale-[1.02] transition-transform"
             >
+              <Star className="absolute right-2 top-2 hover:text-yellow-500 cursor-pointer" />
               {/* Player Image */}
               <div className="w-full h-48 bg-neutral-100 flex justify-center items-center overflow-hidden">
                 {p.headshot?.href ? (

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { getUserFromToken } from "../../utils/authenticateUser";
 
-const prisma = new PrismaClient();
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET as string;
 export async function PATCH(request: NextRequest) {
   const req = await request.json();

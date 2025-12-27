@@ -44,7 +44,9 @@ const Navbar = () => {
     <motion.nav
       initial={false}
       animate={{
-        backgroundColor: scrolled ? "rgba(10,10,10,0.85)" : "rgba(0,0,0,0)",
+        backgroundColor: scrolled
+          ? "rgba(10,10,10,0.85)"
+          : "rgba(10, 10, 10, 1)",
         backdropFilter: scrolled ? "blur(16px)" : "none",
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
